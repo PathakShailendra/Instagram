@@ -20,3 +20,24 @@ export const createUserController = async (req, res, next) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+export const loginUserController = async (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { email, password } = req.body;
+
+    const user = await userService.loginUser({ email, password });
+
+    const token = user.generateToken();
+
+    return res.status(200).json({ user, token });
+  } catch (error) {
+    console.log(error);
+    res.status(401).send(error.message);
+  }
+};

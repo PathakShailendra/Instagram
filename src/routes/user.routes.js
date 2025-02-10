@@ -9,4 +9,14 @@ router.post(
   userController.createUserController
 );
 
+router.post(
+  "/login",
+  userMiddleware.loginUserValidation,
+  userController.loginUserController
+);
+
+router.get("/profile", userMiddleware.authUser, (req, res) => {
+  res.json({ user: req.user });
+});
+
 export default router;
