@@ -42,6 +42,56 @@ export const createPost = async (req, res, next) => {
 
 }
 
+export const getAllPosts = async (req, res, next) => {
+
+  try {
+      const limit = req.query.limit || 10;
+      const skip = req.query.skip || 0;
+
+      const recentPosts = await postModel.getRecentPosts(limit, skip);
+
+      res.status(200).json({
+          posts: recentPosts
+      });
+
+  } catch (err) {
+      console.log(err)
+      res.send(500).json({
+          message: "Internal Server Error"
+      })
+
+  }
+
+}
+
+export const getPost = async (req, res, next) => {
+  try {
+
+      const postId = req.params.postId;
+
+      if (!postModel.isValidPostId(postId)) {
+          return res.status(400).json({ message: "Invalid Post ID" });
+      }
+
+
+      const post = await postModel.findById(postId).populate('author');
+
+
+      if (!post) {
+          return res.status(404).json({ message: "Post not found" });
+      }
+
+      res.status(200).json({
+          post
+      });
+
+  } catch (err) {
+      console.log(err);
+      res.status(500).send("Internal Server Error");
+  }
+}
+
+
 
 export const likePost = async (req, res, next) => {
 
@@ -82,8 +132,6 @@ export const likePost = async (req, res, next) => {
       res.status(500).send("Internal Server Error");
   }
 }
-
-
 
 export const removeLikePost = async (req, res, next) => {
 
@@ -131,3 +179,4 @@ export const removeLikePost = async (req, res, next) => {
   }
 
 }
+
