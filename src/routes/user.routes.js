@@ -21,4 +21,10 @@ router.get("/profile", userMiddleware.authUser, (req, res) => {
 
 router.get('/logout', userMiddleware.authUser, userController.logoutUserController);
 
+router.get('/get-messages',
+  userMiddleware.authUser,
+  userController.getMessagesController
+)
+
+
 export default router;

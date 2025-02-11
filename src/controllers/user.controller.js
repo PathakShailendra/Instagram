@@ -2,6 +2,7 @@ import userModel from "../models/user.js ";
 import { validationResult } from "express-validator";
 import * as userService from "../services/user.service.js";
 import redis from "../services/redis.service.js";
+import messageModel from "../models/message.model.js";
 
 export const createUserController = async (req, res, next) => {
   const errors = validationResult(req);
@@ -55,3 +56,31 @@ export const logoutUserController = async (req, res, next) => {
 
   res.send("logout");
 };
+
+export const getMessagesController = async (req, res) => {
+  try {
+
+      const messages = await messageModel.find({
+          $or: [
+              {
+                  sender: req.user._id,
+                  receiver: req.query.userId
+              },
+              {
+                  sender: req.query.userId,
+                  receiver: req.user._id
+              }
+          ]
+      })
+
+      res.status(200).json({
+          messages,
+          messagesCount: messages.length,
+          message: "Messages are successfully fetched"
+      });
+
+  } catch (err) {
+      console.log(err);
+      res.status(500).send(err.message);
+  }
+}
